@@ -1,27 +1,51 @@
-# Phone Peeking — Interactive iPhone Mockup
+# Phone Peeking — Interactive iPhone Story
 
-A static HTML/CSS/JavaScript demo designed to be uploaded directly to GitHub and published with GitHub Pages.
+Simulasi iPhone bergaya iOS yang berjalan langsung di browser. Proyek ini menggunakan HTML, CSS, dan JavaScript biasa sehingga mudah diimpor ke GitHub dan dapat dipublikasikan melalui GitHub Pages.
 
-## Files
-- `index.html` — phone structure, lock screen, keypad, home screen, app screens
-- `style.css` — iPhone frame, wallpaper, lock screen, icons and responsive styling
-- `app.js` — passcode validation and interactions
-- `wallpaper.jpg` — the supplied photo, used on the lock screen, home screen and Instagram demo
+## Fitur
 
-## Run locally
-Open `index.html` in a browser. No build tools or dependencies are required.
+- Lockscreen menggunakan foto pertama (`assets/wallpaper-lock.jpg`).
+- Homescreen menggunakan foto kedua (`assets/wallpaper-home.jpg`).
+- Geser layar ke atas atau tekan petunjuk untuk membuka keypad.
+- Kode sandi **1809** wajib dimasukkan sebelum homescreen dapat dibuka.
+- Notifikasi WhatsApp di lockscreen.
+- Homescreen dengan ikon aplikasi, termasuk Instagram, WhatsApp, dan Music.
+- Instagram, WhatsApp, dan Music membuka halaman splash sederhana tanpa isi aplikasi, sesuai desain mockup.
+- Mendukung layar sentuh dan keyboard desktop.
 
-## Publish with GitHub Pages
-1. Create a GitHub repository.
-2. Upload **all four files** (`index.html`, `style.css`, `app.js`, `wallpaper.jpg`) to the repository root.
-3. Open **Settings → Pages**.
-4. Under Build and deployment, choose **Deploy from a branch**, select `main` and `/ (root)`, then Save.
-5. Wait for the published URL to appear in the Pages section.
+> Ini adalah simulasi front-end untuk cerita/visualisasi, bukan sistem keamanan sungguhan. Kode sandi dapat dilihat di `app.js`.
 
-## Demo passcode
+## Struktur repository
+
+```text
+phone-peeking/
+├── assets/
+│   ├── wallpaper-lock.jpg
+│   └── wallpaper-home.jpg
+├── index.html
+├── style.css
+├── app.js
+└── README.md
+```
+
+## Menjalankan secara lokal
+
+1. Unduh atau clone repository.
+2. Pastikan kedua gambar berada di folder `assets/`.
+3. Buka `index.html` di browser. Untuk pengalaman yang lebih konsisten, gunakan ekstensi Live Server pada VS Code.
+
+## Import ke GitHub
+
+1. Buat repository baru di GitHub.
+2. Unggah semua file dan folder di atas, dengan struktur yang sama.
+3. Buka **Settings → Pages**.
+4. Pada bagian build/deployment, pilih **Deploy from a branch**, pilih branch `main` dan folder `/ (root)`, lalu simpan.
+5. Tunggu proses deploy selesai dan buka URL GitHub Pages yang diberikan GitHub.
+
+## Mengubah foto wallpaper
+
+Ganti file `assets/wallpaper-lock.jpg` untuk foto lockscreen dan `assets/wallpaper-home.jpg` untuk foto homescreen. Pertahankan nama file agar tidak perlu mengubah CSS.
+
+## Kode sandi
+
 `1809`
-
-The phone starts locked. Entering the correct passcode opens the home screen; any other four-digit code is rejected. Tap the Instagram icon to open the local Instagram-style mock screen.
-
-## Note
-This is a front-end visual demo, not device security. Anyone who can inspect or modify the JavaScript can discover the demo passcode. It does not connect to Instagram or provide real account access.
