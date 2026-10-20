@@ -1,129 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10152b">
-<title>iPhone Peek — Interactive Demo</title>
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101116">
+  <title>Phone Peeking — iPhone Demo</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="toolbar">
-  <button onclick="togglePeek()">📱 Peek</button>
-  <button onclick="showOverlay('control')">☷ Control Center</button>
-  <button onclick="showOverlay('notifications')">🔔 Notifications</button>
-  <button onclick="lockPhone()">🔒 Lock</button>
-</div>
-
-<div class="phone" id="phone">
-  <div class="wallpaper"></div>
-  <div class="island"></div>
-  <div class="status">
-    <span id="statusTime">9:41</span>
-    <span class="status-right">▂ ▄ ▆  ▰</span>
-  </div>
-
-  <section class="screen lock" id="lockScreen">
-    <div class="lock-symbol" id="lockSymbol">🔒</div>
-    <div class="date" id="date">Tuesday, October 20</div>
-    <div class="clock" id="clock">9:41</div>
-    <div class="lock-hint">Enter Passcode</div>
-    <div class="dots" id="dots">
-      <span class="dot"></span><span class="dot"></span>
-      <span class="dot"></span><span class="dot"></span>
-    </div>
-    <div class="keypad">
-      <button class="key" onclick="pressKey('1')">1<small>&nbsp;</small></button>
-      <button class="key" onclick="pressKey('2')">2<small>ABC</small></button>
-      <button class="key" onclick="pressKey('3')">3<small>DEF</small></button>
-      <button class="key" onclick="pressKey('4')">4<small>GHI</small></button>
-      <button class="key" onclick="pressKey('5')">5<small>JKL</small></button>
-      <button class="key" onclick="pressKey('6')">6<small>MNO</small></button>
-      <button class="key" onclick="pressKey('7')">7<small>PQRS</small></button>
-      <button class="key" onclick="pressKey('8')">8<small>TUV</small></button>
-      <button class="key" onclick="pressKey('9')">9<small>WXYZ</small></button>
-      <button class="key" style="visibility:hidden"></button>
-      <button class="key" onclick="pressKey('0')">0<small>&nbsp;</small></button>
-      <button class="key" onclick="deleteKey()" aria-label="Delete">⌫</button>
-    </div>
-    <div class="message" id="message"></div>
-    <div class="shortcut-row">
-      <button class="shortcut" onclick="flashlight()" aria-label="Flashlight">🔦</button>
-      <button class="shortcut" onclick="openCamera()" aria-label="Camera">📷</button>
-    </div>
-    <div class="swipe-hint">Swipe up or enter passcode</div>
-  </section>
-
-  <section class="screen home" id="homeScreen">
-    <div class="greeting">Tuesday ✨</div>
-    <div class="apps">
-      <button class="app" onclick="openApp('Messages','💬')"><span class="app-icon" style="background:#35c96b">💬</span>Messages</button>
-      <button class="app" onclick="openApp('Calendar','📅')"><span class="app-icon" style="background:#fff">📅</span>Calendar</button>
-      <button class="app" onclick="openApp('Photos','🌈')"><span class="app-icon" style="background:#fff">🌈</span>Photos</button>
-      <button class="app" onclick="openCamera()"><span class="app-icon" style="background:#ddd">📷</span>Camera</button>
-      <button class="app" onclick="openApp('Weather','🌤️')"><span class="app-icon" style="background:#62b5ff">🌤️</span>Weather</button>
-      <button class="app" onclick="openApp('Notes','📝')"><span class="app-icon" style="background:#ffe15b">📝</span>Notes</button>
-      <button class="app" onclick="openApp('Settings','⚙️')"><span class="app-icon" style="background:#d9dbe2">⚙️</span>Settings</button>
-      <button class="app" onclick="openApp('Music','🎵')"><span class="app-icon" style="background:#ff4775">🎵</span>Music</button>
-      <button class="app" onclick="showOverlay('notifications')"><span class="app-icon" style="background:#eee">🔔</span>Alerts</button>
-      <button class="app" onclick="showOverlay('control')"><span class="app-icon" style="background:#343b62">☷</span>Controls</button>
-      <button class="app" onclick="openApp('Maps','🗺️')"><span class="app-icon" style="background:#eee">🗺️</span>Maps</button>
-      <button class="app" onclick="openApp('Clock','⏰')"><span class="app-icon" style="background:#fff">⏰</span>Clock</button>
-    </div>
-    <div class="dock"><div class="apps">
-      <button class="app" onclick="openApp('Phone','📞')"><span class="app-icon" style="background:#35c96b">📞</span></button>
-      <button class="app" onclick="openApp('Safari','🌐')"><span class="app-icon" style="background:#fff">🌐</span></button>
-      <button class="app" onclick="openApp('Mail','✉️')"><span class="app-icon" style="background:#eaf2ff">✉️</span></button>
-      <button class="app" onclick="openApp('Music','🎵')"><span class="app-icon" style="background:#ff4775">🎵</span></button>
-    </div></div>
-  </section>
-
-  <div class="panel" id="appPanel">
-    <div class="panel-icon" id="panelIcon">📱</div>
-    <h2 id="panelTitle">App</h2>
-    <p id="panelText">This is an interactive app preview.</p>
-    <div id="panelExtra"></div>
-    <button onclick="closeApp()">Back to Home</button>
-    <button onclick="lockPhone()">Lock Phone</button>
-  </div>
-
-  <div class="overlay" id="controlOverlay">
-    <h2>Control Center</h2>
-    <div class="toggle-grid">
-      <button class="toggle" onclick="toggleButton(this)"><strong>✈️</strong>Airplane Mode</button>
-      <button class="toggle" onclick="toggleButton(this)"><strong>📶</strong>Wi-Fi</button>
-      <button class="toggle" onclick="toggleButton(this)"><strong>ᛒ</strong>Bluetooth</button>
-      <button class="toggle" onclick="toggleButton(this)"><strong>🌙</strong>Focus</button>
-      <button class="toggle" onclick="toggleButton(this)"><strong>🔒</strong>Rotation Lock</button>
-      <button class="toggle" onclick="toggleButton(this)"><strong>🔦</strong>Flashlight</button>
-    </div>
-    <div class="media-card">♫ &nbsp; Not Playing<br><small>Music controls — demo</small></div>
-    <div class="media-card">☼ &nbsp; Display brightness<br><input type="range" min="30" max="100" value="85" oninput="document.querySelector('.wallpaper').style.filter='brightness('+this.value+'%)'"></div>
-    <button class="small-btn" onclick="hideOverlays()">Done</button>
-  </div>
-
-  <div class="overlay" id="notificationsOverlay">
-    <h2>Notification Center</h2>
-    <div class="notification"><span class="n-icon">💬</span><div><b>Messages</b><small>You have a new message · now</small>Hey! How are you?</div></div>
-    <div class="notification"><span class="n-icon">📅</span><div><b>Calendar</b><small>Upcoming event</small>Your schedule is ready to view.</div></div>
-    <div class="notification"><span class="n-icon">🌈</span><div><b>Photos</b><small>Memories</small>Look back at a favorite moment.</div></div>
-    <button class="small-btn" onclick="hideOverlays()">Close</button>
-  </div>
-
-  <div class="camera-view" id="cameraView">
-    <div class="camera-top"><button class="small-btn" onclick="closeCamera()">✕</button><span>PHOTO</span><button class="small-btn" onclick="flashlight()">⚡</button></div>
-    <div style="position:absolute;top:45%;width:100%;text-align:center;color:#ffffffb5;font-size:12px">Camera preview · simulation</div>
-    <div class="camera-bottom">
-      <span>🖼️</span><div><button class="shutter" onclick="takePhoto()" aria-label="Take photo"></button><div class="camera-label">PHOTO</div></div><button class="small-btn" onclick="flipCamera()">↻</button>
-    </div>
-  </div>
-  <div class="toast" id="toast"></div>
-  <div class="indicator" id="indicator" onclick="homeAction()"></div>
-</div>
-
-<div class="caption">Demo passcode: <b>1809</b> · Swipe up to unlock · Tap icons to explore</div>
-
-<script src="app.js" defer></script>
+  <main class="stage">
+    <div class="hint">PHONE PEEKING <span>· interactive demo</span></div>
+    <section class="phone" aria-label="Interactive iPhone mockup">
+      <div class="side-button mute"></div><div class="side-button volume-up"></div><div class="side-button volume-down"></div><div class="side-button power"></div>
+      <div class="screen">
+        <div class="wallpaper"></div>
+        <div class="status-bar"><span id="statusTime">9:41</span><div class="dynamic-island"></div><div class="status-icons"><span>▮▮▮</span><span>◉</span><span class="battery"><i></i></span></div></div>
+        <section id="lockScreen" class="lock-screen">
+          <div class="lock-top"><span class="tiny-lock">⌑</span><span>Swipe up to unlock</span></div>
+          <div class="lock-clock" id="lockClock">9:41</div>
+          <div class="lock-date" id="lockDate">Wednesday, October 21</div>
+          <div class="lock-bottom">
+            <div class="lock-message"><span class="message-icon">✦</span><div><b>Welcome back</b><small>Enter your passcode to continue</small></div></div>
+            <div class="passcode-title">Enter Passcode</div>
+            <div class="dots" aria-label="Passcode digits"><i></i><i></i><i></i><i></i></div>
+            <div id="pinError" class="pin-error" aria-live="polite"></div>
+            <div class="keypad" id="keypad">
+              <button data-digit="1">1</button><button data-digit="2">2<small>ABC</small></button><button data-digit="3">3<small>DEF</small></button>
+              <button data-digit="4">4<small>GHI</small></button><button data-digit="5">5<small>JKL</small></button><button data-digit="6">6<small>MNO</small></button>
+              <button data-digit="7">7<small>PQRS</small></button><button data-digit="8">8<small>TUV</small></button><button data-digit="9">9<small>WXYZ</small></button>
+              <span></span><button data-digit="0">0</button><button id="deleteDigit" class="delete-key" aria-label="Delete last digit">⌫</button>
+            </div>
+            <div class="emergency-row"><button id="emergencyButton">Emergency</button><button id="cancelPin">Cancel</button></div>
+          </div>
+        </section>
+        <section id="homeScreen" class="home-screen hidden" aria-label="Home screen">
+          <div class="home-date"><span id="homeClock">9:41</span><span>Wednesday, October 21</span></div>
+          <div class="app-grid">
+            <button class="app-icon" data-app="instagram"><span class="icon-art instagram">◎</span><span>Instagram</span></button>
+            <button class="app-icon" data-app="photos"><span class="icon-art photos">🌈</span><span>Photos</span></button>
+            <button class="app-icon" data-app="messages"><span class="icon-art messages">●</span><span>Messages</span></button>
+            <button class="app-icon" data-app="camera"><span class="icon-art camera">◉</span><span>Camera</span></button>
+            <button class="app-icon" data-app="settings"><span class="icon-art settings">⚙</span><span>Settings</span></button>
+            <button class="app-icon" data-app="notes"><span class="icon-art notes">▤</span><span>Notes</span></button>
+            <button class="app-icon" data-app="music"><span class="icon-art music">♫</span><span>Music</span></button>
+            <button class="app-icon" data-app="calendar"><span class="icon-art calendar"><b>WED</b><strong>21</strong></span><span>Calendar</span></button>
+          </div>
+          <div class="dock">
+            <button class="app-icon" data-app="phone"><span class="icon-art phone-icon">☎</span></button>
+            <button class="app-icon" data-app="messages"><span class="icon-art messages">●</span></button>
+            <button class="app-icon" data-app="safari"><span class="icon-art safari">◉</span></button>
+            <button class="app-icon" data-app="music"><span class="icon-art music">♫</span></button>
+          </div>
+          <div class="home-indicator"></div>
+        </section>
+        <section id="appView" class="app-view hidden">
+          <header class="app-header"><button id="backHome" aria-label="Back to Home">‹</button><span id="appTitle">Instagram</span><button id="lockNow" aria-label="Lock phone">⌑</button></header>
+          <div id="appContent" class="app-content"></div>
+          <div class="home-indicator app-indicator"></div>
+        </section>
+      </div>
+    </section>
+    <p class="footnote">Demo passcode: <b>1809</b> · Tap the screen or enter digits on your keyboard.</p>
+  </main>
+  <script src="app.js"></script>
 </body>
 </html>

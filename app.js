@@ -1,137 +1,93 @@
-const PASSCODE = "1809";
-const phone = document.getElementById("phone");
-const message = document.getElementById("message");
-const dots = [...document.querySelectorAll(".dot")];
-let entered = "", panelOpen = false, overlayOpen = false, cameraOpen = false;
-let touchStartY = null, flashOn = false, cameraFacing = false;
+(() => {
+  const PASSCODE = "1809";
+  let entered = "";
+  const lockScreen = document.getElementById("lockScreen");
+  const homeScreen = document.getElementById("homeScreen");
+  const appView = document.getElementById("appView");
+  const dots = [...document.querySelectorAll(".dots i")];
+  const error = document.getElementById("pinError");
+  const wallpaper = document.querySelector(".wallpaper");
+  const appContent = document.getElementById("appContent");
+  const appTitle = document.getElementById("appTitle");
 
-function updateClock(){
-  const now = new Date();
-  const time = now.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",hour12:false});
-  document.getElementById("clock").textContent = time;
-  document.getElementById("statusTime").textContent = time;
-  document.getElementById("date").textContent = now.toLocaleDateString([], {weekday:"long",month:"long",day:"numeric"});
-}
-updateClock(); setInterval(updateClock, 1000);
-
-function renderDots(){ dots.forEach((d,i)=>d.classList.toggle("filled",i<entered.length)); }
-function pressKey(n){
-  if(phone.classList.contains("unlocked") || entered.length>=4) return;
-  entered+=n; message.textContent=""; renderDots();
-  if(entered.length===4) setTimeout(checkPasscode,180);
-}
-function deleteKey(){entered=entered.slice(0,-1);message.textContent="";renderDots();}
-function checkPasscode(){
-  if(entered===PASSCODE){
-    phone.classList.add("unlocked");
-    document.getElementById("lockSymbol").textContent="🔓";
-    message.textContent="";
-  }else{
-    message.textContent="Incorrect passcode — try again";
-    phone.animate([{transform:"translateX(-5px)"},{transform:"translateX(5px)"},{transform:"translateX(0)"}],{duration:180});
+  function updateDots() { dots.forEach((dot, i) => dot.classList.toggle("filled", i < entered.length)); }
+  function showError(message) {
+    error.textContent = message;
+    document.querySelector(".keypad").animate([{transform:"translateX(0)"},{transform:"translateX(-5px)"},{transform:"translateX(5px)"},{transform:"translateX(0)"}],{duration:220});
   }
-  entered="";renderDots();
-}
-function unlock(){if(!phone.classList.contains("unlocked")){entered=PASSCODE;checkPasscode();}}
-function lockPhone(){
-  hideOverlays();closeCamera();closeApp();
-  phone.classList.remove("unlocked");entered="";renderDots();
-  document.getElementById("lockSymbol").textContent="🔒";
-  message.textContent="";
-}
-function togglePeek(){phone.classList.toggle("peeking");}
-function openApp(name,icon){
-  if(!phone.classList.contains("unlocked"))return;
-  closeCamera();hideOverlays();panelOpen=true;
-  document.getElementById("panelIcon").textContent=icon;
-  document.getElementById("panelTitle").textContent=name;
-  const descriptions={
-    Messages:"Your conversations appear here in this visual demo.",
-    Calendar:"Your events and schedule preview.",
-    Photos:"Your photo library preview.",
-    Weather:"A sample weather app screen.",
-    Notes:"<Use the notes area below to write something.>",
-    Settings:"Personalize this demo phone.",
-    Music:"Music player preview.",
-    Phone:"Phone keypad preview.",
-    Safari:"Browser preview — no website is opened.",
-    Mail:"Inbox preview.",
-    Maps:"Map app preview.",
-    Clock:"Clock and timer preview."
+  function addDigit(digit) {
+    if (entered.length >= 4) return;
+    entered += digit; updateDots(); error.textContent = "";
+    if (entered.length === 4) {
+      if (entered === PASSCODE) {
+        error.textContent = "";
+        setTimeout(() => { lockScreen.classList.add("hidden"); homeScreen.classList.remove("hidden"); entered = ""; updateDots(); }, 180);
+      } else {
+        showError("Incorrect passcode. Try again.");
+        setTimeout(() => { entered = ""; updateDots(); }, 450);
+      }
+    }
+  }
+  document.querySelectorAll("[data-digit]").forEach(btn => btn.addEventListener("click", () => addDigit(btn.dataset.digit)));
+  document.getElementById("deleteDigit").addEventListener("click", () => { entered = entered.slice(0,-1); error.textContent = ""; updateDots(); });
+  document.getElementById("cancelPin").addEventListener("click", () => { entered = ""; updateDots(); error.textContent = ""; });
+  document.getElementById("emergencyButton").addEventListener("click", () => showError("Emergency calling is not available in this demo."));
+  document.addEventListener("keydown", e => {
+    if (lockScreen.classList.contains("hidden")) return;
+    if (/^\d$/.test(e.key)) addDigit(e.key);
+    if (e.key === "Backspace") { entered = entered.slice(0,-1); updateDots(); error.textContent = ""; }
+  });
+  function lockPhone() {
+    appView.classList.add("hidden"); homeScreen.classList.add("hidden"); lockScreen.classList.remove("hidden");
+    entered = ""; updateDots(); error.textContent = "";
+  }
+  document.getElementById("lockNow").addEventListener("click", lockPhone);
+  document.getElementById("backHome").addEventListener("click", () => { appView.classList.add("hidden"); homeScreen.classList.remove("hidden"); });
+  document.querySelectorAll("[data-app]").forEach(btn => btn.addEventListener("click", () => openApp(btn.dataset.app)));
+
+  const appInfo = {
+    photos:["Photos","🌈","Your memories, all in one place."],
+    messages:["Messages","●","Your conversations will appear here."],
+    camera:["Camera","◉","Camera preview is simulated in this demo."],
+    settings:["Settings","⚙","Wallpaper · Display & Brightness · Passcode"],
+    notes:["Notes","▤","A little space for your thoughts."],
+    music:["Music","♫","Your music library is waiting."],
+    calendar:["Calendar","21","Nothing planned for today."],
+    phone:["Phone","☎","Favorites · Recents · Contacts · Keypad"],
+    safari:["Safari","◉","A little window to the web — simulated offline."]
   };
-  document.getElementById("panelText").textContent=descriptions[name]||"This app is a visual preview.";
-  const extra=document.getElementById("panelExtra");
-  extra.innerHTML="";
-  if(name==="Notes"){
-    const area=document.createElement("textarea");
-    area.placeholder="Write a note...";
-    area.style="width:100%;height:140px;margin-top:16px;padding:12px;border:1px solid #ddd;border-radius:12px;font:inherit";
-    extra.appendChild(area);
+  function openApp(name) {
+    homeScreen.classList.add("hidden"); appView.classList.remove("hidden");
+    if (name === "instagram") {
+      appTitle.textContent = "Instagram";
+      appContent.innerHTML = `
+        <div class="ig-top">Instagram <span class="ig-actions">♡　✉</span></div>
+        <div class="stories">
+          <div class="story"><div class="story-ring"><img src="wallpaper.jpg" alt=""></div>Your story</div>
+          <div class="story"><div class="story-ring"><img src="wallpaper.jpg" alt=""></div>alex</div>
+          <div class="story"><div class="story-ring"><img src="wallpaper.jpg" alt=""></div>daily</div>
+          <div class="story"><div class="story-ring"><img src="wallpaper.jpg" alt=""></div>friends</div>
+        </div>
+        <div class="post-head"><img src="wallpaper.jpg" alt=""><span>your.favorites<br><small style="font-weight:400">Suggested for you</small></span><span style="margin-left:auto">•••</span></div>
+        <img class="post-image" src="wallpaper.jpg" alt="Photo used as phone wallpaper">
+        <div class="post-buttons"><span>♡</span><span>♧</span><span>➤</span><span style="margin-left:auto">♧</span></div>
+        <div class="caption"><b>your.favorites</b> a little moment worth keeping ✨<br><span style="color:#777">View all 18 comments</span></div>`;
+    } else {
+      const info = appInfo[name] || ["App","✦","This app is part of the interactive phone demo."];
+      appTitle.textContent = info[0];
+      appContent.innerHTML = `<div class="generic-app"><div class="big-symbol">${info[1]}</div><h2>${info[0]}</h2><p>${info[2]}</p><button id="genericBack">Back to Home</button></div>`;
+      document.getElementById("genericBack").addEventListener("click", () => { appView.classList.add("hidden"); homeScreen.classList.remove("hidden"); });
+    }
   }
-  if(name==="Settings"){
-    extra.innerHTML='<div class="settings-row">🔔 &nbsp; Notifications</div><div class="settings-row">🌙 &nbsp; Display & Brightness</div><div class="settings-row">🔒 &nbsp; Passcode demo: 1809</div>';
+  function setTime() {
+    const now = new Date();
+    const time = now.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+    document.getElementById("statusTime").textContent = time;
+    document.getElementById("lockClock").textContent = time;
+    document.getElementById("homeClock").textContent = time;
+    const date = now.toLocaleDateString([], {weekday:"long",month:"long",day:"numeric"});
+    document.getElementById("lockDate").textContent = date;
+    document.querySelector(".home-date span+span").textContent = date;
   }
-  document.getElementById("appPanel").style.display="block";
-}
-function closeApp(){document.getElementById("appPanel").style.display="none";panelOpen=false;}
-function showOverlay(which){
-  if(which==="control")document.getElementById("controlOverlay").style.display="block";
-  else document.getElementById("notificationsOverlay").style.display="block";
-  overlayOpen=true;
-}
-function hideOverlays(){
-  document.getElementById("controlOverlay").style.display="none";
-  document.getElementById("notificationsOverlay").style.display="none";
-  overlayOpen=false;
-}
-function toggleButton(btn){
-  const active=btn.dataset.active!=="yes";
-  btn.dataset.active=active?"yes":"no";
-  btn.style.background=active?"#3784f6":"#ffffff24";
-}
-function openCamera(){
-  hideOverlays();closeApp();
-  document.getElementById("cameraView").style.display="block";
-  cameraOpen=true;
-}
-function closeCamera(){document.getElementById("cameraView").style.display="none";cameraOpen=false;}
-function takePhoto(){notify("Camera","Photo captured in demo mode.");}
-function flipCamera(){cameraFacing=!cameraFacing;document.getElementById("cameraView").style.filter=cameraFacing?"hue-rotate(35deg)":"none";}
-function flashlight(){
-  flashOn=!flashOn;
-  notify("Flashlight",flashOn?"Flashlight effect enabled (demo).":"Flashlight effect disabled.");
-  document.querySelector(".wallpaper").style.filter=flashOn?"brightness(1.5)":"brightness(1)";
-}
-function notify(title,text){
-  const toast=document.getElementById("toast");
-  toast.innerHTML="<b>"+title+"</b>"+text;
-  toast.style.display="block";
-  clearTimeout(window.toastTimer);
-  window.toastTimer=setTimeout(()=>toast.style.display="none",2200);
-}
-function homeAction(){
-  if(cameraOpen){closeCamera();return;}
-  if(overlayOpen){hideOverlays();return;}
-  if(panelOpen){closeApp();return;}
-  if(phone.classList.contains("unlocked")){return;}
-  unlock();
-}
-
-/* Swipe up to unlock; swipe down from top for notifications/control center. */
-phone.addEventListener("touchstart",e=>{touchStartY=e.touches[0].clientY;},{passive:true});
-phone.addEventListener("touchend",e=>{
-  if(touchStartY===null)return;
-  const endY=e.changedTouches[0].clientY,delta=endY-touchStartY;
-  if(delta < -45 && !phone.classList.contains("unlocked")) unlock();
-  else if(delta < -45 && panelOpen) closeApp();
-  else if(delta > 55 && touchStartY < 100) showOverlay("notifications");
-  else if(delta > 55 && touchStartY > window.innerHeight-130) togglePeek();
-  touchStartY=null;
-},{passive:true});
-
-/* Keyboard shortcuts for desktop testing */
-document.addEventListener("keydown",e=>{
-  if(e.key>="0"&&e.key<="9")pressKey(e.key);
-  if(e.key==="Backspace")deleteKey();
-  if(e.key==="Escape"){hideOverlays();closeApp();closeCamera();}
-});
+  setTime(); setInterval(setTime, 30000);
+})();
